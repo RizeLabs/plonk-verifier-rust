@@ -40,7 +40,7 @@ mod utils {
         pub wxiw: KzgCommitment,
     }
 
-    pub fn getPlonkProof() -> PlonkProof {
+    pub fn get_plonk_proof() -> PlonkProof {
 
         let a_x_p =  <G1Point as AffineCurve>::BaseField::from_str("3391331107546193050127490912878524732339221319611096053981693850015879041085").unwrap();
         let a_y_p = <G1Point as AffineCurve>::BaseField::from_str("6451615961075051326185606036856749805800164346541076346184303537381960838734").unwrap();
@@ -79,6 +79,12 @@ mod utils {
 
         let wxi_affine = G1Projective::new(wxi_x_p, wxi_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
         let wxi_commitment = KzgCommitment(wxi_affine);
+
+        let wxiw_x_p = <G1Point as AffineCurve>::BaseField::from_str("2780525989726764018420379210379839759994073162261397943283103257756511856860").unwrap();
+        let wxiw_y_p = <G1Point as AffineCurve>::BaseField::from_str("12923982292430325868323127343515309985083240380358225279418756761288606931447").unwrap();
+
+        let wxiw_affine = G1Projective::new(wxi_x_p, wxi_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
+        let wxiw_commitment = KzgCommitment(wxi_affine);
 
         let z_affine = G1Projective::new(z_x_p, z_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
         let z_commitment = KzgCommitment(z_affine);
@@ -123,11 +129,13 @@ mod utils {
             eval_s2: Fr::from_str("1834885551332428838300727375535561819990018043056048479258162325986116088327").unwrap(),
             eval_zw: eval_zw,
             eval_r: Fr::from_str("11410710969449562470071038294456377378562621755076252052836692477638805717495").unwrap(),
-            wxi: a_commitment,
-            wxiw: a_commitment,
+            wxi: wxi_commitment,
+            wxiw: wxiw_commitment,
         };
-        proof;        
+        proof
     }
 
-    pub fn getVerificationKey() {}
+    pub fn get_vk() {
+        
+    }
 }
