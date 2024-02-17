@@ -191,20 +191,7 @@ pub mod verifier {
         // calculateD()
 
         // print!("{:?}", proof);
-      
-      
-        let f = calculate_f(proof, v1, v2, v3, v4, v5);
-        println!("f x{:?}", f.x.to_string());
-        println!("f y{:?}", f.y.to_string());
-
-        println!("final r0 {}", r0.to_string());
-        
-
-        let e = calculate_E(r0, proof, u, v1, v2, v3, v4, v5);
-        // print!("{:?}", proof);
-
-        // let eval_l1 = Fp256::from_str("11988539173825008689538634671317926564558556971777001090206161159450797172546").unwrap();
-        calculateD(
+        let d = calculateD(
             gamma, 
             betaXi, 
             Fp256::from(2), 
@@ -216,7 +203,20 @@ pub mod verifier {
             proof,
             xin,
             zh
-        );                
+        );    
+      
+        let f = calculate_f(proof, v1, v2, v3, v4, v5, d);
+        println!("f x{:?}", f.x.to_string());
+        println!("f y{:?}", f.y.to_string());
+
+        println!("final r0 {}", r0.to_string());
+        
+
+        let e = calculate_E(r0, proof, u, v1, v2, v3, v4, v5);
+        // print!("{:?}", proof);
+
+        // let eval_l1 = Fp256::from_str("11988539173825008689538634671317926564558556971777001090206161159450797172546").unwrap();
+                 
     
     }
 
@@ -236,7 +236,7 @@ pub mod verifier {
             proof: PlonkProof,
             xin: Fp256<FrParameters>,
             zh: Fp256<FrParameters>
-        )
+        )-> GroupAffine<Parameters>
         
         {
 
@@ -271,17 +271,17 @@ pub mod verifier {
 
 
         
-            let mut d = qm_affine.mul(eval_a_into_eval_b);
+            let mut d = qm_affine.mul(eval_a_into_eval_b).into_affine();
 
             println!("d {:?}", d.to_string());
 
-            d = d.add(ql_affine.mul(eval_a));
+            d = d.add(ql_affine.mul(eval_a).into_affine());
 
             println!("ql_a {:?}", d.to_string());
 
-            d = d.add( qr_affine.mul(eval_b));
+            d = d.add( qr_affine.mul(eval_b).into_affine());
 
-            d = d.add(qo_affine.mul(eval_c));
+            d = d.add(qo_affine.mul(eval_c).into_affine());
 
             println!("final d {:?}", d.to_string());
 
@@ -306,6 +306,7 @@ pub mod verifier {
 
             let mut z = *proof.z.inner();
 
+            //d2
             let d2 = z.mul(d2a.add(d2b).add(u)).into_affine();
 
             println!("d2 {:?}", d2.to_string());
@@ -329,7 +330,7 @@ pub mod verifier {
             let s3_y = <G1Point as AffineCurve>::BaseField::from_str("14708106523280006289643854838096574099969523979927705115839740814287748610680").unwrap();
             let s3_affine = G1Projective::new(s3_x, s3_y, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
 
-            let d3 = s3_affine.mul(val1.mul(val2.mul(val3))).into_affine();
+            let mut d3 = s3_affine.mul(val1.mul(val2.mul(val3))).into_affine();
 
             println!("d3 {:?}", d3.to_string());
 
@@ -348,13 +349,17 @@ pub mod verifier {
             println!("d4 {:?}", d4.to_string());
 
 
+            //final
 
+            d3 = -d3;
+            d4 = -d4;
+            d = d.add(d2);
+            d = d.add(d3);
+            d = d.add(d4);
 
+            println!("final d {:?}", d.to_string());
 
-
-
-
-
+            d
 }
     
 
@@ -407,7 +412,7 @@ pub mod verifier {
         pi
     }
 
-    pub fn calculate_f(proof: PlonkProof, v1: Fp256<FrParameters>, v2: Fp256<FrParameters>, v3: Fp256<FrParameters>, v4: Fp256<FrParameters>, v5: Fp256<FrParameters>) -> GroupAffine<Parameters> {
+    pub fn calculate_f(proof: PlonkProof, v1: Fp256<FrParameters>, v2: Fp256<FrParameters>, v3: Fp256<FrParameters>, v4: Fp256<FrParameters>, v5: Fp256<FrParameters>, d: GroupAffine<Parameters>) -> GroupAffine<Parameters> {
         let PlonkProof {
             a: a,
             b: b,
@@ -428,16 +433,13 @@ pub mod verifier {
         let s_y_2 = <G1Point as AffineCurve>::BaseField::from_str("18351947949312641279139525707675648861898823980801914700748293475468468405778").unwrap();
         
         let s2_affine = G1Projective::new(s_x_2, s_y_2, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
-
-        let d_x = <G1Point as AffineCurve>::BaseField::from_str("12666435046384658404409583525473450230172226690730467901543922284322472961475").unwrap();
-        let d_y = <G1Point as AffineCurve>::BaseField::from_str("13658003628221264547878886863410062940256997495045129927343096614540833534333").unwrap();
         
-        let d_affine = G1Projective::new(d_x, d_y, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
+        // let d_affine = G1Projective::new(d_x, d_y, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
 
 
         let in_complete_f = a_affine.mul(v1).add(b_affine.mul(v2).add(c_affine.mul(v3).add(s1_affine.mul(v4).add(s2_affine.mul(v5))))).into_affine();        
 
-        d_affine.add(in_complete_f)
+        d.add(in_complete_f)
 
         // let f = (v1.mul(a)).add(v2.mul(b)).add(v3.mul(c)).add(v4.mul(s1)).add(v5.mul(s2)).add(zw);
         // f
