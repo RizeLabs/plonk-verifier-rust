@@ -38,6 +38,7 @@ pub mod utils {
         pub eval_s2: Fr,
         pub eval_zw: Fr,
         pub eval_r: Fr,
+        pub pi: Fr,
         pub wxi: KzgCommitment,
         pub wxiw: KzgCommitment,
     }
@@ -116,6 +117,7 @@ pub mod utils {
             eval_s2: Fr::from_str("18528016128263279091264827025576269655151738875625751164199105939098225113539").unwrap(),
             eval_zw: Fr::from_str("19038588322698518798348739810505212451458100152031223020479859202175121868652").unwrap(),
             eval_r: Fr::from_str("11410710969449562470071038294456377378562621755076252052836692477638805717495").unwrap(),
+            pi: Fr::from_str("7713112592372404476342535432037683616424591277138491596200192981572885523208").unwrap(),
             wxi: wxi_commitment,
             wxiw: wxiw_commitment,
         };

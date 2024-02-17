@@ -71,10 +71,10 @@ pub mod verifier {
         )
         .unwrap();
 
-        let pi: Fp256<FrParameters> = Fr::from_str(
-            "10021071990350671093045688305445916367264617343457315103161905320545395462791",
-        )
-        .unwrap();
+        // let pi: Fp256<FrParameters> = Fr::from_str(
+        //     "10021071990350671093045688305445916367264617343457315103161905320545395462791",
+        // )
+        // .unwrap();
     
         let n = Fr::from_str("2048").unwrap(); 
 
@@ -85,10 +85,25 @@ pub mod verifier {
 
         let proof: PlonkProof = get_plonk_proof();
 
+        let pi = calculate_pi(lagrange, proof);
+
         let r0 = calcualteR0(aplha, aplha2, beta, gamma, proof, lagrange, pi);
 
         print!("final r0 {}", r0.to_string());
         // print!("{:?}", proof);
+    }
+
+    fn calculate_pi(lagrange: Fp256<FrParameters>, proof: PlonkProof) -> Fp256<FrParameters> {
+        let PlonkProof {
+            pi: pub_input,
+            ..
+        } = proof;
+
+        let pi_input = Fr::zero();
+
+        let pi = pi_input.sub(lagrange.mul(pub_input));
+        // println!("pi {:?}", pi.to_string());
+        pi
     }
 
     pub fn calcualteR0(alpha: Fp256<FrParameters>, alpha2: Fp256<FrParameters>, beta: Fp256<FrParameters>, gamma: Fp256<FrParameters>, proof: PlonkProof, lagrange: Fp256<FrParameters>, pi: Fp256<FrParameters>) -> Fp256<FrParameters> {
