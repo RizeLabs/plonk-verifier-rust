@@ -44,74 +44,59 @@ pub mod utils {
 
     pub fn get_plonk_proof() -> PlonkProof {
 
-        let a_x_p =  <G1Point as AffineCurve>::BaseField::from_str("3391331107546193050127490912878524732339221319611096053981693850015879041085").unwrap();
-        let a_y_p = <G1Point as AffineCurve>::BaseField::from_str("6451615961075051326185606036856749805800164346541076346184303537381960838734").unwrap();
+        let a_x_p = <G1Point as AffineCurve>::BaseField::from_str("1078334906893789514326100165891809848019336850231558106434853250714105685786").unwrap();
+        let a_y_p = <G1Point as AffineCurve>::BaseField::from_str("12948923423229301041562867238331904424847534881201052576626140469622636061826").unwrap();
         
         let a_affine = G1Projective::new(a_x_p, a_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
-
+        
         let a_commitment = KzgCommitment(a_affine);
-
-        let b_x_p =  <G1Point as AffineCurve>::BaseField::from_str("21683537853259339251063152245237531702090647847126293038809031327008963203108").unwrap();
-        let b_y_p = <G1Point as AffineCurve>::BaseField::from_str("18391047229041192027119387365071094242052630625649388692858480541036553880351").unwrap();
+        
+        let b_x_p = <G1Point as AffineCurve>::BaseField::from_str("14871968772362298531943225503095829341924221467861921630107399429839476377261").unwrap();
+        let b_y_p = <G1Point as AffineCurve>::BaseField::from_str("20832225230760737481879255829686244402434679017360094720847540179928583113429").unwrap();
         
         let b_affine: ark_ec::short_weierstrass_jacobian::GroupAffine<ark_bn254::g1::Parameters> = G1Projective::new(b_x_p, b_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
         let b_commitment = KzgCommitment(b_affine);
-
-        let c_x_p =  <G1Point as AffineCurve>::BaseField::from_str("11621292064649230445391937986030104439133575577360444671422851910837301411829").unwrap();
-        let c_y_p = <G1Point as AffineCurve>::BaseField::from_str("12846527394780535006077377608327231671887851965940114019717015962888986407415").unwrap();
+        
+        let c_x_p = <G1Point as AffineCurve>::BaseField::from_str("11018249123771408599195936218586462295060894617169990047481063103297346617511").unwrap();
+        let c_y_p = <G1Point as AffineCurve>::BaseField::from_str("20812079485764029398417948581030957233058448081114384385766482068306123340499").unwrap();
         
         let c_affine = G1Projective::new(c_x_p, c_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
-
-        let c_commitment = KzgCommitment(a_affine);
-
-        let z_x_p = <G1Point as AffineCurve>::BaseField::from_str("9662530300557940141476783491796212064762163872492397029727967414740213081250").unwrap();
-        let z_y_p = <G1Point as AffineCurve>::BaseField::from_str("2230166349457580308212762490897620014521593936716050864065785773322261326858").unwrap();
-
+        
+        let c_commitment = KzgCommitment(c_affine);
+        
+        let z_x_p = <G1Point as AffineCurve>::BaseField::from_str("18911369861849293400948671769181923953820381693244798480818014763242334194102").unwrap();
+        let z_y_p = <G1Point as AffineCurve>::BaseField::from_str("17301903807617710475810560475296429124681646194334020082660695106153270924197").unwrap();
+        
         let z_affine = G1Projective::new(z_x_p, z_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
         let z_commitment = KzgCommitment(z_affine);
-
-        let wxi_x_p = <G1Point as AffineCurve>::BaseField::from_str("16492338865768995854154662306809174646444657225640052473237223839472028908904").unwrap();
-        let wxi_y_p = <G1Point as AffineCurve>::BaseField::from_str("21038495490098114078539448908688428463282035962450468815928523871851326375578").unwrap();
-
+        
+        let wxi_x_p = <G1Point as AffineCurve>::BaseField::from_str("9035873252023575753720767347127457878893885607768879055873568678356030733580").unwrap();
+        let wxi_y_p = <G1Point as AffineCurve>::BaseField::from_str("21585298432760990951017113608981855362693473929127174343206877901449604046764").unwrap();
+        
         let wxi_affine = G1Projective::new(wxi_x_p, wxi_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
         let wxi_commitment = KzgCommitment(wxi_affine);
-
-        let wxi_x_p = <G1Point as AffineCurve>::BaseField::from_str("16492338865768995854154662306809174646444657225640052473237223839472028908904").unwrap();
-        let wxi_y_p = <G1Point as AffineCurve>::BaseField::from_str("21038495490098114078539448908688428463282035962450468815928523871851326375578").unwrap();
-
-        let wxi_affine = G1Projective::new(wxi_x_p, wxi_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
-        let wxi_commitment = KzgCommitment(wxi_affine);
-
-        let wxiw_x_p = <G1Point as AffineCurve>::BaseField::from_str("2780525989726764018420379210379839759994073162261397943283103257756511856860").unwrap();
-        let wxiw_y_p = <G1Point as AffineCurve>::BaseField::from_str("12923982292430325868323127343515309985083240380358225279418756761288606931447").unwrap();
-
-        let wxiw_affine = G1Projective::new(wxi_x_p, wxi_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
-        let wxiw_commitment = KzgCommitment(wxi_affine);
-
-        let z_affine = G1Projective::new(z_x_p, z_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
-        let z_commitment = KzgCommitment(z_affine);
-
-        let z_x_p = <G1Point as AffineCurve>::BaseField::from_str("9662530300557940141476783491796212064762163872492397029727967414740213081250").unwrap();
-        let z_y_p = <G1Point as AffineCurve>::BaseField::from_str("2230166349457580308212762490897620014521593936716050864065785773322261326858").unwrap();
-
-        let z_affine = G1Projective::new(z_x_p, z_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
-        let z_commitment = KzgCommitment(z_affine);
-
-        let eval_zw = Fr::from_str("18783639038834474674067895191355971310694141864269021285850927873317795382077").unwrap();
-
-        let t1_x_p = <G1Point as AffineCurve>::BaseField::from_str("13976153128590576937397889869875821651092117150069518539559298883533980395680").unwrap();
-        let t1_y_p = <G1Point as AffineCurve>::BaseField::from_str("11018714681232781839102084684877965925499276423335639813473370288005567457661").unwrap();
-
-        let t2_x_p = <G1Point as AffineCurve>::BaseField::from_str("19763526060651013734725678968159864877425295863829308322002659641339268836352").unwrap();
-        let t2_y_p = <G1Point as AffineCurve>::BaseField::from_str("4665078093642836254430224528352784659803758008562344660512316265311681020080").unwrap();
-
-        let t3_x_p = <G1Point as AffineCurve>::BaseField::from_str("19808840592623791914719484994224028955450551831956248163361229498834932936048").unwrap();
-        let t3_y_p = <G1Point as AffineCurve>::BaseField::from_str("2233260682003588131111649695626313810047664148795308977544617839230576778268").unwrap();
-
+        
+        let wxiw_x_p = <G1Point as AffineCurve>::BaseField::from_str("1849097023576595529567405124779246485506180099711177377631796309107793590717").unwrap();
+        let wxiw_y_p = <G1Point as AffineCurve>::BaseField::from_str("10708519881826667651353678747174273508520559877623541936787968407888335454354").unwrap();
+        
+        let wxiw_affine = G1Projective::new(wxiw_x_p, wxiw_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
+        let wxiw_commitment = KzgCommitment(wxiw_affine);
+        
+        let eval_zw = Fr::from_str("19038588322698518798348739810505212451458100152031223020479859202175121868652").unwrap();
+        
+        let t1_x_p = <G1Point as AffineCurve>::BaseField::from_str("8035481489412023854698082330728841837577166856942677235942161713802425228226").unwrap();
+        let t1_y_p = <G1Point as AffineCurve>::BaseField::from_str("6100259826093601981346932339239322114347879658851780471127604889244409653156").unwrap();
+        
+        let t2_x_p = <G1Point as AffineCurve>::BaseField::from_str("10155064182436199621699595529626653722315634234955723925606936081123556290749").unwrap();
+        let t2_y_p = <G1Point as AffineCurve>::BaseField::from_str("18176178013415694491760099032391438634755777914521625038595348247591920109678").unwrap();
+        
+        let t3_x_p = <G1Point as AffineCurve>::BaseField::from_str("17414543813591730681967718268670846901403831253033280305025278121489872982688").unwrap();
+        let t3_y_p = <G1Point as AffineCurve>::BaseField::from_str("17180628559445942570926171368945985337988231638174686279031469310437333205328").unwrap();
+        
         let t1_affine = G1Projective::new(t1_x_p, t1_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
         let t2_affine = G1Projective::new(t2_x_p, t2_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
         let t3_affine = G1Projective::new(t3_x_p, t3_y_p, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
-
+        
         let t1_commitment = KzgCommitment(t1_affine);
         let t2_commitment = KzgCommitment(t2_affine);
         let t3_commitment = KzgCommitment(t3_affine);
