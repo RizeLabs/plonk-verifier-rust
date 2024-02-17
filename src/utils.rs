@@ -31,7 +31,7 @@ mod utils {
         pub t3: KzgCommitment,
         pub eval_a: Fr,
         pub eval_b: Fr,
-        pub eval_c: Fr,
+        pub eval_c: Fr,§
         pub eval_s1: Fr,
         pub eval_s2: Fr,
         pub eval_zw: Fr,
