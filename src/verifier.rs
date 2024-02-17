@@ -93,7 +93,9 @@ pub mod verifier {
 
         let r0 = calcualteR0(aplha, aplha2, beta, gamma, proof, lagrange, pi);
 
-        let f_incomplete = calculate_f(proof, v1, v2, v3, v4, v5);
+        let f = calculate_f(proof, v1, v2, v3, v4, v5);
+        println!("f x{:?}", f.x.to_string());
+        println!("f y{:?}", f.y.to_string());
 
         print!("final r0 {}", r0.to_string());
         // print!("{:?}", proof);
@@ -132,16 +134,17 @@ pub mod verifier {
         let s_x_2 = <G1Point as AffineCurve>::BaseField::from_str("21421714290183048746230047877229262977674171892814788767166398067614207270732").unwrap();
         let s_y_2 = <G1Point as AffineCurve>::BaseField::from_str("18351947949312641279139525707675648861898823980801914700748293475468468405778").unwrap();
         
-        let s2_affine = G1Projective::new(s_x_1, s_y_1, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
+        let s2_affine = G1Projective::new(s_x_2, s_y_2, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
 
-        let s_x_3 = <G1Point as AffineCurve>::BaseField::from_str("9950124792368664692570829131382246903633159137508810057227137955860009005660").unwrap();
-        let s_y_3 = <G1Point as AffineCurve>::BaseField::from_str("14708106523280006289643854838096574099969523979927705115839740814287748610680").unwrap();
+        let d_x = <G1Point as AffineCurve>::BaseField::from_str("12666435046384658404409583525473450230172226690730467901543922284322472961475").unwrap();
+        let d_y = <G1Point as AffineCurve>::BaseField::from_str("13658003628221264547878886863410062940256997495045129927343096614540833534333").unwrap();
         
-        let s3_affine = G1Projective::new(s_x_1, s_y_1, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
-        
+        let d_affine = G1Projective::new(d_x, d_y, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
+
+
         let in_complete_f = a_affine.mul(v1).add(b_affine.mul(v2).add(c_affine.mul(v3).add(s1_affine.mul(v4).add(s2_affine.mul(v5))))).into_affine();        
 
-        in_complete_f
+        d_affine.add(in_complete_f)
 
         // let f = (v1.mul(a)).add(v2.mul(b)).add(v3.mul(c)).add(v4.mul(s1)).add(v5.mul(s2)).add(zw);
         // f
