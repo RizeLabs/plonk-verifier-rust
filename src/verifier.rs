@@ -103,24 +103,25 @@ pub mod verifier {
         } = proof;
 
         let e1 = pi;
+        println!("e1 {:?}", e1.to_string());
+        // let e1b = BigInt::from_str(s1.to_string().as_str()).unwrap();
         let e2 = lagrange.mul(alpha2);
-        let e3a = beta.mul(s1).add(gamma);
+        println!("e2 {:?}", e2.to_string());
+        
+        let e3a = ((beta.mul(s1)).add(a)).add(gamma);
+
+        println!("e3a {:?}", e3a.to_string());
         let e3b = (beta.mul(s2).add(b)).add(gamma);
+        println!("e3b {:?}", e3b.to_string());
         let e3c = c.add(gamma);
+        println!("e3c {:?}", e3c.to_string());
         let e3 = alpha.mul(zw.mul(e3c.mul(e3a.mul(e3b))));
-        let r0 = e3.sub(e1.sub(e2));
+        println!("e3 {:?}", e3.to_string());
+        let ri  = e1.sub(e2);
+        println!("ri {:?}", ri.to_string());
+        let r0 = ri.sub(e3);
 
         r0
-
-        // let exp1 = alpha.mul(a.add(beta.mul(s1).add(gamma)));
-        // let exp2 = b.add(beta.mul(s2).add(gamma));
-        // let exp3 = c.add(gamma).mul(zw);
-
-        // let final_r0 = pi.sub(lagrange.mul(alpha2).sub(exp1.mul(exp2.mul(exp3))));
-
-        // final_r0
-        // need to do PI(zh) - L1(zh)*alpha2 - final_exp 
-        // ps waiting for PI(zh) and L1(zh) calculation 
     }
 
     pub fn calculateLagrange(n: Fp256<FrParameters> , zh: Fp256<FrParameters>) -> Fp256<FrParameters> {
