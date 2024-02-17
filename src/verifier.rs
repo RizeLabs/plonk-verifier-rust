@@ -70,29 +70,70 @@ pub mod verifier {
             "18100393929293372189165175191067012844444248477558768048865905094957039702827",
         )
         .unwrap();
+
+        let pi: Fp256<FrParameters> = Fr::from_str(
+            "10021071990350671093045688305445916367264617343457315103161905320545395462791",
+        )
+        .unwrap();
     
         let n = Fr::from_str("2048").unwrap(); 
 
-        // let lagrange = calculateLagrange(n, zh);
+        let lagrange = calculateLagrange(n, xi);
 
-        // println!("Lagrange {:?}", lagrange);
+        println!("Lagrange {:?}", lagrange);
         
 
         let proof: PlonkProof = get_plonk_proof();
+
+        let r0 = calcualteR0(aplha, aplha2, beta, gamma, proof, lagrange, pi);
+
+        print!("final r0 {}", r0.to_string());
         // print!("{:?}", proof);
     }
 
-    // pub fn calculateLagrange(n: Fp256<FrParameters> , zh: Fp256<FrParameters>) -> Fp256<FrParameters> {
-    //     let w = Fr::one();
+    pub fn calcualteR0(alpha: Fp256<FrParameters>, alpha2: Fp256<FrParameters>, beta: Fp256<FrParameters>, gamma: Fp256<FrParameters>, proof: PlonkProof, lagrange: Fp256<FrParameters>, pi: Fp256<FrParameters>) -> Fp256<FrParameters> {
+        let PlonkProof {
+            eval_a: a,
+            eval_b: b,
+            eval_c: c,
+            eval_s1: s1,
+            eval_s2: s2,
+            eval_zw: zw,
+            ..
+        } = proof;
 
-    //     let denom = n * (zh - w);
-    //     let domain: u64 = 2048;
-    //     let numerator = w * (zh.pow([domain]) - w);
-    //     let lagrange = numerator.mul(denom.inverse().unwrap());
-    //     // let val = lagrange
+        let e1 = pi;
+        let e2 = lagrange.mul(alpha2);
+        let e3a = beta.mul(s1).add(gamma);
+        let e3b = (beta.mul(s2).add(b)).add(gamma);
+        let e3c = c.add(gamma);
+        let e3 = alpha.mul(zw.mul(e3c.mul(e3a.mul(e3b))));
+        let r0 = e3.sub(e1.sub(e2));
 
-    //     print!("Lagrange {:?}", lagrange.to_string());
+        r0
 
-    //     lagrange
-    // }
+        // let exp1 = alpha.mul(a.add(beta.mul(s1).add(gamma)));
+        // let exp2 = b.add(beta.mul(s2).add(gamma));
+        // let exp3 = c.add(gamma).mul(zw);
+
+        // let final_r0 = pi.sub(lagrange.mul(alpha2).sub(exp1.mul(exp2.mul(exp3))));
+
+        // final_r0
+        // need to do PI(zh) - L1(zh)*alpha2 - final_exp 
+        // ps waiting for PI(zh) and L1(zh) calculation 
+    }
+
+    pub fn calculateLagrange(n: Fp256<FrParameters> , zh: Fp256<FrParameters>) -> Fp256<FrParameters> {
+        let w = Fr::one();
+
+        let denom = n * (zh - w);
+        let domain: u64 = 2048;
+        let numerator = w * (zh.pow([domain]) - w);
+        let lagrange = numerator.mul(denom.inverse().unwrap());
+        // let val = lagrange
+
+        print!("Lagrange {:?}", lagrange.to_string());
+
+        lagrange
+    }
 }
