@@ -79,7 +79,31 @@ pub mod verifier {
         
 
         let proof: PlonkProof = get_plonk_proof();
+
+        let r0 = calcualteR0(aplha, aplha2, beta, gamma, proof);
         // print!("{:?}", proof);
+    }
+
+    pub fn calcualteR0(alpha: Fp256<FrParameters>, alpha2: Fp256<FrParameters>, beta: Fp256<FrParameters>, gamma: Fp256<FrParameters>, proof: PlonkProof) -> Fp256<FrParameters> {
+        let PlonkProof {
+            eval_a: a,
+            eval_b: b,
+            eval_c: c,
+            eval_s1: s1,
+            eval_s2: s2,
+            eval_zw: zw,
+            ..
+        } = proof;
+
+        let exp1 = alpha.mul(a + beta.mul(s1) + gamma);
+        let exp2 = b + beta.mul(s2) + gamma;
+        let exp3 = (c + gamma).mul(zw);
+
+        let final_exp = exp1.mul(exp2.mul(exp3));
+
+        final_exp
+        // need to do PI(zh) - L1(zh)*alpha2 - final_exp 
+        // ps waiting for PI(zh) and L1(zh) calculation 
     }
 
     // pub fn calculateLagrange(n: Fp256<FrParameters> , zh: Fp256<FrParameters>) -> Fp256<FrParameters> {
