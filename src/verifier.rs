@@ -1,5 +1,5 @@
 pub mod verifier {
-    use ark_bn254::{Bn254, FqParameters, Fr, FrParameters, G1Projective, g1::Parameters};
+    use ark_bn254::{Bn254, FqParameters, Fr, FrParameters, G1Projective, g1::Parameters, g1};
     use ark_ec::short_weierstrass_jacobian::GroupAffine;
     use ark_ec::*;
     use ark_ff::{Field, Fp256, One, PrimeField, UniformRand, Zero};
@@ -64,8 +64,13 @@ pub mod verifier {
         .unwrap();
         let xi: Fp256<FrParameters> = Fr::from_str(
             "2036501310948870752400564319467871188178099508325597424996516092094167193038",
+        ).unwrap();
+        
+        let u: Fp256<FrParameters> = Fr::from_str(
+            "3671131478064498243238023262552279287106793140894919933179355516438710425648",
         )
         .unwrap();
+        
         let xin: Fp256<FrParameters> = Fr::from_str(
             "18100393929293372189165175191067012844444248477558768048865905094957039702828",
         )
@@ -74,11 +79,6 @@ pub mod verifier {
             "18100393929293372189165175191067012844444248477558768048865905094957039702827",
         )
         .unwrap();
-
-        // let pi: Fp256<FrParameters> = Fr::from_str(
-        //     "10021071990350671093045688305445916367264617343457315103161905320545395462791",
-        // )
-        // .unwrap();
     
         let n = Fr::from_str("2048").unwrap(); 
 
@@ -97,8 +97,46 @@ pub mod verifier {
         println!("f x{:?}", f.x.to_string());
         println!("f y{:?}", f.y.to_string());
 
-        print!("final r0 {}", r0.to_string());
+        println!("final r0 {}", r0.to_string());
+        
+
+        let e = calculate_E(r0, proof, u, v1, v2, v3, v4, v5);
         // print!("{:?}", proof);
+    }
+
+    fn calculate_E(r0: Fp256<FrParameters>, proof: PlonkProof, u: Fp256<FrParameters>, v1: Fp256<FrParameters>, v2: Fp256<FrParameters>, v3: Fp256<FrParameters>, v4: Fp256<FrParameters>, v5: Fp256<FrParameters>) -> GroupAffine<Parameters> {
+        let PlonkProof {
+            eval_a: a,
+            eval_b: b,
+            eval_c: c,
+            eval_s1: s1,
+            eval_s2: s2,
+            eval_zw: zw,
+            ..
+        } = proof;
+
+        let mut s = -r0;
+        s = s.add(a.mul(v1));
+        s = s.add(b.mul(v2));
+        s = s.add(c.mul(v3));
+        s = s.add(s1.mul(v4));
+        s = s.add(s2.mul(v5));
+        s = s.add(zw.mul(u));
+
+        let g1_x = <G1Point as AffineCurve>::BaseField::from_str("1").unwrap();
+        let g1_y = <G1Point as AffineCurve>::BaseField::from_str("2").unwrap();
+        
+        let g1_affine = G1Projective::new(g1_x, g1_y, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
+
+        let val = g1_affine.mul(s).into_affine();
+
+        println!("val x {:?}", val.x.to_string());
+        println!( "val y {:?}", val.y.to_string());
+
+        val
+
+        // println!("s {:?}", s.to_string());
+
     }
 
     fn calculate_pi(lagrange: Fp256<FrParameters>, proof: PlonkProof) -> Fp256<FrParameters> {
