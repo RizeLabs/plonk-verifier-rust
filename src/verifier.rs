@@ -1,15 +1,19 @@
 pub mod verifier {
-    use ark_bn254::{Bn254, FqParameters, Fr, FrParameters};
+    use ark_bn254::{Bn254, FqParameters, Fr, FrParameters, G1Projective, g1::Parameters};
+    use ark_ec::short_weierstrass_jacobian::GroupAffine;
     use ark_ec::*;
     use ark_ff::{Field, Fp256, One, PrimeField, UniformRand, Zero};
     // use ark_ff::*;
-    pub use crate::utils::utils::{get_plonk_proof, PlonkProof};
+    pub use crate::utils::utils::{get_plonk_proof, PlonkProof, KzgCommitment};
     use ark_poly::univariate::DensePolynomial;
     use ark_poly::{domain, Polynomial};
     use std::fmt::{Debug, DebugMap, Display};
     use std::ops::{Add, Mul, Neg, Sub};
     use std::str::FromStr;
     use num_bigint::*;
+
+    pub type G1Point = <Bn254 as PairingEngine>::G1Affine;
+    pub type G2Point = <Bn254 as PairingEngine>::G2Affine;
 
     pub fn verify() {
 
@@ -89,6 +93,8 @@ pub mod verifier {
 
         let r0 = calcualteR0(aplha, aplha2, beta, gamma, proof, lagrange, pi);
 
+        let f_incomplete = calculate_f(proof, v1, v2, v3, v4, v5);
+
         print!("final r0 {}", r0.to_string());
         // print!("{:?}", proof);
     }
@@ -104,6 +110,42 @@ pub mod verifier {
         let pi = pi_input.sub(lagrange.mul(pub_input));
         // println!("pi {:?}", pi.to_string());
         pi
+    }
+
+    pub fn calculate_f(proof: PlonkProof, v1: Fp256<FrParameters>, v2: Fp256<FrParameters>, v3: Fp256<FrParameters>, v4: Fp256<FrParameters>, v5: Fp256<FrParameters>) -> GroupAffine<Parameters> {
+        let PlonkProof {
+            a: a,
+            b: b,
+            c: c,
+            ..
+        } = proof;
+
+        let a_affine = a.0;
+        let b_affine = b.0;
+        let c_affine = c.0;
+
+        let s_x_1 = <G1Point as AffineCurve>::BaseField::from_str("2277685636083563024253879452693986130212942936235758785876153581019640880319").unwrap();
+        let s_y_1 = <G1Point as AffineCurve>::BaseField::from_str("5558146521438681597961812116362946523808729442181555954974750217085655765563").unwrap();
+        
+        let s1_affine = G1Projective::new(s_x_1, s_y_1, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
+
+        let s_x_2 = <G1Point as AffineCurve>::BaseField::from_str("21421714290183048746230047877229262977674171892814788767166398067614207270732").unwrap();
+        let s_y_2 = <G1Point as AffineCurve>::BaseField::from_str("18351947949312641279139525707675648861898823980801914700748293475468468405778").unwrap();
+        
+        let s2_affine = G1Projective::new(s_x_1, s_y_1, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
+
+        let s_x_3 = <G1Point as AffineCurve>::BaseField::from_str("9950124792368664692570829131382246903633159137508810057227137955860009005660").unwrap();
+        let s_y_3 = <G1Point as AffineCurve>::BaseField::from_str("14708106523280006289643854838096574099969523979927705115839740814287748610680").unwrap();
+        
+        let s3_affine = G1Projective::new(s_x_1, s_y_1, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
+        
+        let in_complete_f = a_affine.mul(v1).add(b_affine.mul(v2).add(c_affine.mul(v3).add(s1_affine.mul(v4).add(s2_affine.mul(v5))))).into_affine();        
+
+        in_complete_f
+
+        // let f = (v1.mul(a)).add(v2.mul(b)).add(v3.mul(c)).add(v4.mul(s1)).add(v5.mul(s2)).add(zw);
+        // f
+
     }
 
     pub fn calcualteR0(alpha: Fp256<FrParameters>, alpha2: Fp256<FrParameters>, beta: Fp256<FrParameters>, gamma: Fp256<FrParameters>, proof: PlonkProof, lagrange: Fp256<FrParameters>, pi: Fp256<FrParameters>) -> Fp256<FrParameters> {
