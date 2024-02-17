@@ -203,15 +203,19 @@ pub mod verifier {
         let e = calculate_E(r0, proof, u, v1, v2, v3, v4, v5);
         // print!("{:?}", proof);
 
-        let eval_l1 = Fp256::from_str("11988539173825008689538634671317926564558556971777001090206161159450797172546").unwrap();
+        // let eval_l1 = Fp256::from_str("11988539173825008689538634671317926564558556971777001090206161159450797172546").unwrap();
         calculateD(
             gamma, 
             betaXi, 
             Fp256::from(2), 
-            eval_l1, 
+            lagrange, 
             aplha, 
             aplha2, 
-            u 
+            u ,
+            beta,
+            proof,
+            xin,
+            zh
         );                
     
     }
@@ -227,7 +231,11 @@ pub mod verifier {
             eval_l1: Fp256<FrParameters>, 
             alpha: Fp256<FrParameters>, 
             alpha2: Fp256<FrParameters>, 
-            u: Fp256<FrParameters>, 
+            u: Fp256<FrParameters>,
+            beta: Fp256<FrParameters>,
+            proof: PlonkProof,
+            xin: Fp256<FrParameters>,
+            zh: Fp256<FrParameters>
         )
         
         {
@@ -236,14 +244,17 @@ pub mod verifier {
             let qc_y = <G1Point as AffineCurve>::BaseField::from_str("0").unwrap();
             let qc_affine = G1Projective::new(qc_x, qc_y, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
 
+            println!("qc_affine {:?}", qc_affine.to_string());
+
             
-            let eval_a_into_eval_b: Fp256<FrParameters> = Fp256::from_str("1645188846976919578283751811856989119143482059083800477641627476904775990270").unwrap();
-            let eval_a: Fp256<FrParameters> = Fp256::from_str("7619444648548762352688989264071365525087666293572605752963973137331466620379").unwrap();
-            let eval_b: Fp256<FrParameters> = Fp256::from_str("12564993388515609407621530932388481577961227603586802807221481569176168238260").unwrap();
-            let eval_c: Fp256<FrParameters> = Fp256::from_str("6511986115001766925734365330664692166783761208764259458159980563836620574767").unwrap();
+
+            let eval_a = proof.eval_a;
+            let eval_b = proof.eval_b;
+            let eval_c = proof.eval_c;
+            let eval_a_into_eval_b = eval_a.mul(eval_b);
             
-            let qm_x = <G1Point as AffineCurve>::BaseField::from_str("20835273517253247507278161354140085192179560558424391762960775729600393482750").unwrap();
-            let qm_y = <G1Point as AffineCurve>::BaseField::from_str("16191201213275001001200617578554070333626688786050641588918630575263395623273").unwrap();
+            let qm_x = <G1Point as AffineCurve>::BaseField::from_str("19151686162665193639218175163708172641368045642989460974532342422984533758298").unwrap();
+            let qm_y = <G1Point as AffineCurve>::BaseField::from_str("16425900297592082064122235865674265321861003269908656946806802359646002523562").unwrap();
             let qm_affine = G1Projective::new(qm_x, qm_y, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
 
             let ql_x = <G1Point as AffineCurve>::BaseField::from_str("20835273517253247507278161354140085192179560558424391762960775729600393482750").unwrap();
@@ -260,26 +271,29 @@ pub mod verifier {
 
 
         
-            let qm_ab = qm_affine.mul(eval_a_into_eval_b);
+            let mut d = qm_affine.mul(eval_a_into_eval_b);
 
-            println!("qm_ab {:?}", qm_ab.to_string());
+            println!("d {:?}", d.to_string());
 
+            d = d.add(ql_affine.mul(eval_a));
 
-            let ql_a = ql_affine.mul(eval_a);
+            println!("ql_a {:?}", d.to_string());
 
-            let qr_b = qr_affine.mul(eval_b);
+            d = d.add( qr_affine.mul(eval_b));
 
-            let qo_c = qo_affine.mul(eval_c);
+            d = d.add(qo_affine.mul(eval_c));
 
+            println!("final d {:?}", d.to_string());
 
-
-            let d = qc_affine.add(qm_ab.into()).add(ql_a.into()).add(qr_b.into()).add(qo_c.into());
             //todo values should be in q field
-            let val1 = (eval_a.add(betaxi)).add(gamma);
+            let mut val1 = (eval_a.add(betaxi)).add(gamma);
+            println!("val1 {:?}", val1.to_string());
 
-            let val2 = (eval_b.add(betaxi.mul(Fp256::from(1)))).add(gamma);
+            let mut val2 = (eval_b.add(betaxi.mul(Fp256::from(2)))).add(gamma);
+            println!("val2 {:?}", val2.to_string());
 
-            let val3 = gamma.add(eval_c.add(betaxi.mul(k2)));
+            let mut val3 = gamma.add(eval_c.add(betaxi.mul(Fp256::from(3))));
+            println!("val3 {:?}", val3.to_string());
 
             let d2a = val1.mul(val2.mul(val3)).mul(alpha);
 
@@ -291,6 +305,52 @@ pub mod verifier {
             let proof = get_plonk_proof();
 
             let mut z = *proof.z.inner();
+
+            let d2 = z.mul(d2a.add(d2b).add(u)).into_affine();
+
+            println!("d2 {:?}", d2.to_string());
+
+            val1 = gamma.add(eval_a.add(proof.eval_s1.mul(beta)));
+
+            println!("val1 {:?}", val1.to_string());
+
+            val2 = gamma.add(eval_b.add(proof.eval_s2.mul(beta)));
+
+            println!("val2 {:?}", val2.to_string());
+
+            val3 = alpha.mul(beta).mul(proof.eval_zw);
+
+            println!("val3 {:?}", val3.to_string());
+
+
+            //d3
+
+            let s3_x = <G1Point as AffineCurve>::BaseField::from_str("9950124792368664692570829131382246903633159137508810057227137955860009005660").unwrap();
+            let s3_y = <G1Point as AffineCurve>::BaseField::from_str("14708106523280006289643854838096574099969523979927705115839740814287748610680").unwrap();
+            let s3_affine = G1Projective::new(s3_x, s3_y, <G1Projective as ProjectiveCurve>::BaseField::one()).into_affine();
+
+            let d3 = s3_affine.mul(val1.mul(val2.mul(val3))).into_affine();
+
+            println!("d3 {:?}", d3.to_string());
+
+            //d4
+
+            let mut d4 = *proof.t1.inner();
+
+            d4 = d4.add((*proof.t2.inner()).mul(xin).into_affine());
+
+            let xin2 = xin.mul(xin);
+
+            d4 = d4.add((*proof.t3.inner()).mul(xin2).into_affine());
+
+            d4 = d4.mul(zh).into_affine();
+
+            println!("d4 {:?}", d4.to_string());
+
+
+
+
+
 
 
 
