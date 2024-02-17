@@ -1,9 +1,9 @@
-mod utils {
+pub mod utils {
 
     use ark_bn254::{Bn254, Fr, G1Projective};
     use ark_poly::univariate::DensePolynomial;
     use ark_ec::{PairingEngine, AffineCurve, ProjectiveCurve};
-    use ark_ff::{One}
+    use ark_ff::{One};
     use std::{
         convert::TryInto, fmt::Display, ops::{Add, Mul}, rc::Rc, str::FromStr, sync::Mutex
     };
@@ -21,6 +21,8 @@ mod utils {
             &self.0
         }
     }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub struct PlonkProof {
         pub a: KzgCommitment,
         pub b: KzgCommitment,
@@ -31,7 +33,7 @@ mod utils {
         pub t3: KzgCommitment,
         pub eval_a: Fr,
         pub eval_b: Fr,
-        pub eval_c: Fr,§
+        pub eval_c: Fr,
         pub eval_s1: Fr,
         pub eval_s2: Fr,
         pub eval_zw: Fr,
