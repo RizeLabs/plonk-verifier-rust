@@ -257,6 +257,7 @@ dependencies = [
  "ark-ec",
  "ark-ff",
  "ark-poly",
+ "num-bigint",
 ]
 
 [[package]]

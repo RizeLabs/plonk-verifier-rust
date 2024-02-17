@@ -9,6 +9,7 @@ pub mod verifier {
     use std::fmt::{Debug, DebugMap, Display};
     use std::ops::{Add, Mul, Neg, Sub};
     use std::str::FromStr;
+    use num_bigint::*;
 
     pub fn verify() {
 
@@ -72,23 +73,26 @@ pub mod verifier {
     
         let n = Fr::from_str("2048").unwrap(); 
 
-        let lagrange = calculateLagrange(n, zh);
+        // let lagrange = calculateLagrange(n, zh);
 
-        println!("Lagrange {:?}", lagrange);
+        // println!("Lagrange {:?}", lagrange);
         
 
         let proof: PlonkProof = get_plonk_proof();
-        print!("{:?}", proof);
+        // print!("{:?}", proof);
     }
 
-    pub fn calculateLagrange(n: Fp256<FrParameters> , zh: Fp256<FrParameters>) -> Fp256<FrParameters> {
-        let w = Fr::one();
+    // pub fn calculateLagrange(n: Fp256<FrParameters> , zh: Fp256<FrParameters>) -> Fp256<FrParameters> {
+    //     let w = Fr::one();
 
-        let denom = n * (zh - w);
-        let domain: u64 = 2048;
-        let numerator = w * (zh.pow([domain]) - w);
-        let lagrange = numerator.mul(denom.inverse().unwrap());
+    //     let denom = n * (zh - w);
+    //     let domain: u64 = 2048;
+    //     let numerator = w * (zh.pow([domain]) - w);
+    //     let lagrange = numerator.mul(denom.inverse().unwrap());
+    //     // let val = lagrange
 
-        lagrange
-    }
+    //     print!("Lagrange {:?}", lagrange.to_string());
+
+    //     lagrange
+    // }
 }
